@@ -3,13 +3,11 @@ name = "evm-iterator"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 web3 = "0.19.0"
 contracts = "0.6.3"
-tokio = {version = "1.35.1", features = ["full"]}
-ethers = {version = "2.0.11", default-features = false, features = ["legacy"]}
+tokio = { version = "1.35.1", features = ["full"] }
+ethers = { version = "2.0.11", default-features = false, features = ["legacy"] }
 thiserror = "1.0.56"
 serde = { version = "1.0.195", features = ["derive"] }
 serde_yaml = "0.9.30"

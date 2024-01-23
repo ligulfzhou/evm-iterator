@@ -16,6 +16,7 @@ pub struct EvmConfig {
     pub rpcs: Vec<String>,
     pub erc20s: Vec<Erc20>,
     pub to: String,
+    pub interval: i32
 }
 
 #[derive(Debug, Deserialize)]
@@ -27,10 +28,9 @@ pub fn load_evm_configs() -> MyResult<EvmConfigs> {
     let current_dir = Path::new(file!())
         .parent()
         .expect("Failed to get current directory");
-    // let current_dir = env::current_dir().expect("Failed to get current directory");
     println!("current_dir: {:?}", current_dir);
+
     let file_path = Path::new(&current_dir).join("evms.yaml");
-    // .as_path();
     let mut file = File::open(file_path.as_path()).expect("Failed to open evms.yaml file");
     let mut file_content = String::new();
     file.read_to_string(&mut file_content)

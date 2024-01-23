@@ -1,11 +1,12 @@
+use crate::account::MyWallet;
 use crate::error::MyResult;
 use ethers::core::rand;
-use ethers::signers::{coins_bip39::English, LocalWallet, MnemonicBuilder};
-use crate::account::MyWallet;
+use ethers::prelude::coins_bip39::Mnemonic;
+use ethers::signers::{coins_bip39::English, MnemonicBuilder};
 
-pub fn generate_mnemonic() -> MyResult<LocalWallet> {
+pub fn generate_mnemonic() -> MyResult<String> {
     let mut rng = rand::thread_rng();
-    Ok(MnemonicBuilder::<English>::default().build_random(&mut rng)?)
+    Ok(Mnemonic::<English>::new(&mut rng).to_phrase())
 }
 
 pub fn from_mnemonic(mnemonic: &str, index: u32) -> MyResult<MyWallet> {
@@ -17,3 +18,17 @@ pub fn from_mnemonic(mnemonic: &str, index: u32) -> MyResult<MyWallet> {
     Ok(MyWallet(wallet))
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::account::mnemonic::generate_mnemonic;
+
+    #[test]
+    fn test_generate_mnemonic_code() {
+        assert!(generate_mnemonic().is_ok())
+    }
+
+    #[test]
+    fn test_from_mnemonic() {
+    }
+
+}
