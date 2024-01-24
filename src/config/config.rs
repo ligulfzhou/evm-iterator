@@ -16,7 +16,7 @@ pub struct EvmConfig {
     pub rpcs: Vec<String>,
     pub erc20s: Vec<Erc20>,
     pub to: String,
-    pub interval: i32
+    // pub interval: i32
 }
 
 #[derive(Debug, Deserialize)]

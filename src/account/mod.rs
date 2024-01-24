@@ -3,6 +3,7 @@ use ethers::signers::{LocalWallet, Signer};
 pub mod keypair;
 pub mod mnemonic;
 
+#[derive(Clone)]
 pub struct MyWallet(LocalWallet);
 
 impl MyWallet {

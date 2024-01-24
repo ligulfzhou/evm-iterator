@@ -8,7 +8,7 @@ evms:
       - name: usdt
         contract: "0xdac17f958d2ee523a2206206994597c13d831ec7"
     to: "0x3c1ed145521467d03292af3254041230301f43c1"
-    interval: 5
+#    interval: 5
 
   - name: zksyncEra
     rpcs:
@@ -19,4 +19,4 @@ evms:
       - name: usdt
         contract: "0x493257fD37EDB34451f62EDf8D2a0C418852bA4C"
     to: "0x3c1ed145521467d03292af3254041230301f43c1"
-    interval: 5
+#    interval: 5
