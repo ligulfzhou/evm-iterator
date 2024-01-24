@@ -47,7 +47,9 @@ mod test {
         );
 
         let my_wallet = from_mnemonic("fatal brass black survey crucial assist timber pattern execute sister illegal trade friend rival main", 1).unwrap();
-        assert_eq!("89E9ADC4494993B73691D5B226B31E2BEB8B10C9E3DC6D975F9ED1E5A7BFF891".to_string(), my_wallet.get_private_key());
-
+        assert_eq!(
+            "89E9ADC4494993B73691D5B226B31E2BEB8B10C9E3DC6D975F9ED1E5A7BFF891".to_string(),
+            my_wallet.get_private_key()
+        );
     }
 }

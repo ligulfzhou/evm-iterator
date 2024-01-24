@@ -8,10 +8,10 @@ pub enum MyError {
     /// 登陆相关
     // #[error("登陆失败")]
     // LoginFail,
-    //
+
     // #[error("密码错误")]
     // LoginFailForPasswordIsWrong,
-    //
+
     // #[error("未登陆")]
     // NotAuthorized,
 

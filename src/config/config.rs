@@ -28,7 +28,6 @@ pub fn load_evm_configs() -> MyResult<EvmConfigs> {
     let current_dir = Path::new(file!())
         .parent()
         .expect("Failed to get current directory");
-    println!("current_dir: {:?}", current_dir);
 
     let file_path = Path::new(&current_dir).join("evms.yaml");
     let mut file = File::open(file_path.as_path()).expect("Failed to open evms.yaml file");

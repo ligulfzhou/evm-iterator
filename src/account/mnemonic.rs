@@ -28,7 +28,5 @@ mod tests {
     }
 
     #[test]
-    fn test_from_mnemonic() {
-    }
-
+    fn test_from_mnemonic() {}
 }

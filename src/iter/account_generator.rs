@@ -1,13 +1,12 @@
-use std::thread::sleep;
-use std::time::Duration;
 use crate::account::keypair::generate_random_account;
 use crate::account::MyWallet;
 use crate::iter::evm_handler::BalanceChecker;
+use std::time::Duration;
 
 pub trait Subject {
     fn add_observer(&mut self, observer: Box<dyn BalanceChecker>);
     fn remove_observer(&mut self, observer: Box<dyn BalanceChecker>);
-    fn notify_observers(&self, account: MyWallet);
+    async fn notify_observers(&self, account: MyWallet);
 }
 
 pub struct AccountGenerator {
@@ -19,12 +18,13 @@ impl AccountGenerator {
         Self { observers: vec![] }
     }
 
-    pub fn start_generating_accounts(&mut self) {
+    pub async fn start_generating_accounts(&self) {
         loop {
-            sleep(Duration::new(5, 0));
+            tokio::time::sleep(Duration::new(5, 0)).await;
 
             let new_account = generate_random_account();
-            self.notify_observers(new_account);
+            println!("get new account: {:?}", new_account.get_address());
+            self.notify_observers(new_account).await;
         }
     }
 }
@@ -35,13 +35,13 @@ impl Subject for AccountGenerator {
     }
 
     fn remove_observer(&mut self, observer: Box<dyn BalanceChecker>) {
-        // self.observers.retain(|o| !Box::eq(o, &observer));
-        todo!()
+        // Box::eq
+        self.observers.retain(|o| !std::ptr::eq(o, &observer));
     }
 
-    fn notify_observers(&self, account: MyWallet) {
-        self.observers.iter().for_each(|observer| {
-            observer.check_balance(account.clone())
-        })
+    async fn notify_observers(&self, account: MyWallet) {
+        for observer in self.observers.iter() {
+            observer.check_balance(account.clone()).await;
+        }
     }
 }
