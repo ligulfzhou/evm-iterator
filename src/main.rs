@@ -1,11 +1,13 @@
 use crate::error::MyResult;
-use crate::iter::account_generator::{AccountGenerator, Subject};
-use crate::iter::evm_handler::EvmHandler;
+use crate::evm::account::keypair::RandomAccountGenerator;
+use crate::iterator::handler::EvmHandler;
+use crate::iterator::wallet_interator::AccountGenerator;
 
-mod account;
+// mod account;
 mod config;
 mod error;
-mod iter;
+mod evm;
+mod iterator;
 
 #[tokio::main]
 async fn main() -> MyResult<()> {
@@ -19,8 +21,11 @@ async fn main() -> MyResult<()> {
 
     let mut account_generator = AccountGenerator::new();
     for handler in handlers {
-        account_generator.add_observer(Box::new(handler));
+        account_generator.add_observer(handler);
     }
+
+    let random_generator = RandomAccountGenerator;
+    account_generator.add_generator(Box::new(random_generator));
 
     account_generator.start_generating_accounts().await;
 
