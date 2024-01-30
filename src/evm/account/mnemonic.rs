@@ -3,7 +3,7 @@ use crate::evm::account::GenAccount;
 use crate::evm::my_wallet::MyWallet;
 use ethers::core::rand;
 use ethers::prelude::coins_bip39::Mnemonic;
-use ethers::signers::{coins_bip39::English, MnemonicBuilder};
+use ethers::signers::{coins_bip39::English, MnemonicBuilder, Signer};
 
 pub struct MnemonicAccountGenerator {
     mnemonic: String,
@@ -18,35 +18,31 @@ impl MnemonicAccountGenerator {
         Self { mnemonic, index: 0 }
     }
 
-    pub fn regenerate_mnemonic(&mut self) {
+    fn reset(&mut self) {
         let mut rng = rand::thread_rng();
         self.mnemonic = Mnemonic::<English>::new(&mut rng).to_phrase();
         self.index = 0;
-    }
-
-    pub fn gen_from_mnemonic(&mut self) -> MyResult<MyWallet> {
-        if self.index > 10 {
-            self.regenerate_mnemonic();
-        }
-        let wallet = MnemonicBuilder::<English>::default()
-            .phrase(self.mnemonic.as_str())
-            .index(self.index)?
-            .build()?;
-
-        Ok(MyWallet(wallet))
     }
 }
 
 impl GenAccount for MnemonicAccountGenerator {
     fn generate_account(&mut self) -> MyResult<MyWallet> {
         if self.index > 10 {
-            self.regenerate_mnemonic();
+            self.reset();
         }
         let wallet = MnemonicBuilder::<English>::default()
             .phrase(self.mnemonic.as_str())
             .index(self.index)?
             .build()?;
 
+        println!(
+            "mnemonic: {:}, index: {:}, address: {:}",
+            self.mnemonic,
+            self.index,
+            wallet.address()
+        );
+
+        self.index += 1;
         Ok(MyWallet(wallet))
     }
 }

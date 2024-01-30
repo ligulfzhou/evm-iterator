@@ -16,7 +16,7 @@ impl AccountGenerator {
         }
     }
 
-    pub async fn start_generating_accounts(&mut self) {
+    pub async fn start_generating_accounts(&mut self) -> MyResult<()> {
         loop {
             let accounts = self
                 .generators
@@ -29,12 +29,7 @@ impl AccountGenerator {
                 .collect::<Vec<MyWallet>>();
 
             for account in accounts.into_iter() {
-                match self.notify_observers(account).await {
-                    Ok(_) => {}
-                    Err(e) => {
-                        println!("error occur: {:?}", e)
-                    }
-                }
+                self.notify_observers(account).await?;
             }
         }
     }

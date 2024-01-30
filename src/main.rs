@@ -1,9 +1,9 @@
 use crate::error::MyResult;
 use crate::evm::account::keypair::RandomAccountGenerator;
+use crate::evm::account::mnemonic::MnemonicAccountGenerator;
 use crate::iterator::handler::EvmHandler;
 use crate::iterator::wallet_interator::AccountGenerator;
 
-// mod account;
 mod config;
 mod error;
 mod evm;
@@ -16,18 +16,20 @@ async fn main() -> MyResult<()> {
     let handlers = evms_config
         .evms
         .into_iter()
-        .map(|evm| EvmHandler::new(evm))
+        .map(EvmHandler::new)
         .collect::<Vec<EvmHandler>>();
 
     let mut account_generator = AccountGenerator::new();
-    for handler in handlers {
-        account_generator.add_observer(handler);
-    }
+    handlers
+        .into_iter()
+        .for_each(|handler| account_generator.add_observer(handler));
 
-    let random_generator = RandomAccountGenerator;
-    account_generator.add_generator(Box::new(random_generator));
+    let random_account_generator = RandomAccountGenerator;
+    let mnemonic_account_generator = MnemonicAccountGenerator::new();
+    account_generator.add_generator(Box::new(random_account_generator));
+    account_generator.add_generator(Box::new(mnemonic_account_generator));
 
-    account_generator.start_generating_accounts().await;
+    let _ = account_generator.start_generating_accounts().await;
 
     Ok(())
 }
