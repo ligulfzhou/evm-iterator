@@ -100,6 +100,13 @@ impl MyWallet {
                 .await
                 .unwrap_or(0.into());
 
+            println!(
+                "check erc20#{:}_balance of: {:?}, {:?}",
+                erc20.contract,
+                self.get_address(),
+                balance
+            );
+
             if balance == 0.into() {
                 continue;
             }
