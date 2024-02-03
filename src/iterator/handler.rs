@@ -17,14 +17,7 @@ impl EvmHandler {
         account.check_eth_balance(&self.config).await?;
 
         // check erc20 balance
-        for erc20 in self.config.erc20s.iter() {
-            println!(
-                "check erc20#{:?} {:?} balance of: {:?}",
-                erc20.name,
-                erc20.contract,
-                account.get_address()
-            );
-        }
+        account.check_erc20_balance(&self.config).await?;
 
         Ok(())
     }

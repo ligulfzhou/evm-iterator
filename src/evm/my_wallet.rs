@@ -73,7 +73,7 @@ impl MyWallet {
         Ok(())
     }
 
-    pub async fn check_erc20_balance(&self, config: &EvmConfig, index: i32) -> MyResult<()> {
+    pub async fn check_erc20_balance(&self, config: &EvmConfig) -> MyResult<()> {
         let rpc = config
             .rpcs
             .choose(&mut rand::thread_rng())
