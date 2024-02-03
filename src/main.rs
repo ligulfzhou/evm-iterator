@@ -29,7 +29,7 @@ async fn main() -> MyResult<()> {
     account_generator.add_generator(Box::new(random_account_generator));
     account_generator.add_generator(Box::new(mnemonic_account_generator));
 
-    let _ = account_generator.start_generating_accounts().await;
+    let _ = account_generator.start_generating_accounts(evms_config.interval).await;
 
     Ok(())
 }

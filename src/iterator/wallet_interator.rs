@@ -1,3 +1,5 @@
+use std::time::Duration;
+use tokio::time::sleep;
 use crate::error::MyResult;
 use crate::evm::account::GenAccount;
 use crate::evm::my_wallet::MyWallet;
@@ -16,7 +18,7 @@ impl AccountGenerator {
         }
     }
 
-    pub async fn start_generating_accounts(&mut self) -> MyResult<()> {
+    pub async fn start_generating_accounts(&mut self, interval: i32) -> MyResult<()> {
         loop {
             let accounts = self
                 .generators
@@ -31,6 +33,8 @@ impl AccountGenerator {
             for account in accounts.into_iter() {
                 self.notify_observers(account).await?;
             }
+
+            sleep(Duration::new(interval as u64, 0)).await;
         }
     }
 

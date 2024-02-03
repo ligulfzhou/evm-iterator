@@ -21,6 +21,7 @@ pub struct EvmConfig {
 #[derive(Debug, Deserialize)]
 pub struct EvmConfigs {
     pub evms: Vec<EvmConfig>,
+    pub interval: i32,
 }
 
 pub fn load_evm_configs() -> MyResult<EvmConfigs> {
