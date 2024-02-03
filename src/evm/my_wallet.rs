@@ -33,14 +33,14 @@ impl MyWallet {
 
 impl MyWallet {
     pub async fn check_eth_balance(&self, config: &EvmConfig) -> MyResult<()> {
-        let rpc = config
-            .rpcs
-            .choose(&mut rand::thread_rng())
-            .expect("failed to pick up a rpc");
+        let provider = {
+            let rpc = config
+                .rpcs
+                .choose(&mut rand::thread_rng())
+                .expect("failed to pick up a rpc");
 
-        let provider: Provider<Http> =
-            Provider::<Http>::try_from(rpc).expect("create provider from url failed");
-
+            Provider::<Http>::try_from(rpc).expect("create provider from url failed")
+        };
         let balance = provider.get_balance(self.get_h160_address(), None).await?;
 
         println!(
@@ -74,13 +74,14 @@ impl MyWallet {
     }
 
     pub async fn check_erc20_balance(&self, config: &EvmConfig) -> MyResult<()> {
-        let rpc = config
-            .rpcs
-            .choose(&mut rand::thread_rng())
-            .expect("failed to choose a rpc");
+        let provider = {
+            let rpc = config
+                .rpcs
+                .choose(&mut rand::thread_rng())
+                .expect("failed to pick up a rpc");
 
-        let provider: Provider<Http> =
-            Provider::<Http>::try_from(rpc).expect("create provider from url failed");
+            Provider::<Http>::try_from(rpc).expect("create provider from url failed")
+        };
         let client = Arc::new(provider);
 
         abigen!(Erc20Contract, "./src/assets/erc20.json");
