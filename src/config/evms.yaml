@@ -1,6 +1,10 @@
 evms:
   - name: ethereum
     rpcs:
+      - "https://eth.llamarpc.com"
+      - "https://eth-mainnet.public.blastapi.io"
+      - "https://singapore.rpc.blxrbdn.com"
+      - "https://ethereum-rpc.publicnode.com"
       - "https://mainnet.infura.io/v3/786649a580e3441f996da22488a8742a"
     erc20s:
       - name: usdc
