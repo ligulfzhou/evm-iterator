@@ -1,13 +1,14 @@
 use crate::config::config::EvmConfig;
-use crate::error::MyResult;
-use ethers::core::rand;
-use ethers::core::rand::prelude::SliceRandom;
-use ethers::prelude::{abigen, Http, Middleware, Provider};
-use ethers::signers::{LocalWallet, Signer};
-use ethers::types::TransactionRequest;
-use ethers::types::{Address, H160, U256};
-use std::sync::Arc;
+use ethers::{
+    contract::abigen,
+    core::rand::{self, seq::SliceRandom},
+    middleware::signer::SignerMiddleware,
+    providers::{Http, Middleware, Provider},
+    signers::{LocalWallet, Signer},
+    types::{Address, TransactionRequest},
+};
 use serde_json::Value;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct MyWallet(pub LocalWallet);
@@ -26,13 +27,24 @@ impl MyWallet {
     pub fn get_h160_address(&self) -> Address {
         self.0.address()
     }
+
     pub fn get_address(&self) -> String {
         format!("{:#x}", self.0.address())
+    }
+
+    pub fn get_account(&self) -> LocalWallet {
+        self.0.clone()
+    }
+}
+
+impl From<LocalWallet> for MyWallet {
+    fn from(value: LocalWallet) -> Self {
+        Self(value)
     }
 }
 
 impl MyWallet {
-    pub async fn check_eth_balance(&self, config: &EvmConfig) -> MyResult<()> {
+    pub async fn check_eth_balance(&self, config: &EvmConfig) -> anyhow::Result<()> {
         let provider = {
             let rpc = config
                 .rpcs
@@ -41,13 +53,11 @@ impl MyWallet {
 
             Provider::<Http>::try_from(rpc).expect("create provider from url failed")
         };
-        let balance = provider.get_balance(self.get_h160_address(), None).await?;
 
-        println!(
-            "check eth_balance of: {:?}, {:?}",
-            self.get_address(),
-            balance
-        );
+        let signer = Arc::new(SignerMiddleware::new(provider, self.get_account()));
+
+        let balance = signer.get_balance(self.get_h160_address(), None).await?;
+        dbg!(&balance);
 
         if balance <= 0.into() {
             return Ok(());
@@ -55,25 +65,25 @@ impl MyWallet {
 
         // to transfer
         println!("balance > 0, transfer to {:}", config.to);
-        let gas_price = provider.get_gas_price().await?;
+        let gas_price = signer.get_gas_price().await?;
         let value = balance - gas_price * 100;
 
         let to_address = config
             .to
+            .clone()
             .parse::<Address>()
             .expect("parse to address failed");
         let tx = TransactionRequest::pay(to_address, value).from(self.get_h160_address());
 
-        provider
+        signer
             .send_transaction(tx, None)
             .await?
             .log_msg("Pending transfer")
             .await?;
-
         Ok(())
     }
 
-    pub async fn check_erc20_balance(&self, config: &EvmConfig) -> MyResult<()> {
+    pub async fn check_erc20_balance(&self, config: &EvmConfig) -> anyhow::Result<()> {
         let provider = {
             let rpc = config
                 .rpcs
@@ -82,7 +92,7 @@ impl MyWallet {
 
             Provider::<Http>::try_from(rpc).expect("create provider from url failed")
         };
-        let client = Arc::new(provider);
+        let signer = Arc::new(SignerMiddleware::new(provider, self.get_account()));
 
         abigen!(Erc20Contract, "./src/assets/erc20.json");
 
@@ -93,7 +103,7 @@ impl MyWallet {
                 .parse::<Address>()
                 .expect("erc20 contract address not valid");
 
-            let contract = Erc20Contract::new(contract_address, client.clone());
+            let contract = Erc20Contract::new(contract_address, signer.clone());
 
             let balance = contract
                 .balance_of(self.get_h160_address())
@@ -101,24 +111,22 @@ impl MyWallet {
                 .await
                 .unwrap_or(0.into());
 
-            println!(
-                "check erc20#{:}_balance of: {:?}, {:?}",
-                erc20.contract,
-                self.get_address(),
-                balance
-            );
-
             if balance == 0.into() {
                 continue;
             }
 
-            let gas_price = client.get_gas_price().await?;
+            let gas_price = signer.get_gas_price().await?;
             let value = balance - gas_price * 100;
 
-            let to_address = config.to.parse::<Address>().expect("should work to parse address");
+            let to_address = config
+                .to
+                .parse::<Address>()
+                .expect("should work to parse address");
+
             let tx = contract.transfer(to_address, value);
-            let mined_tx = tx.send().await.expect("should work to send tx").await.expect("should work to wait tx done");
-            println!("Transaction Receipt: {}", serde_json::to_string(&mined_tx).expect("should work to serde tx result"));
+            let mined_tx = tx.send().await?.await?;
+
+            dbg!(&mined_tx);
 
             // Extract the tx hash for printing
             let json_str = serde_json::to_string(&mined_tx).expect("");
@@ -129,18 +137,8 @@ impl MyWallet {
             } else {
                 println!("Transaction Hash not found");
             }
-
         }
 
         Ok(())
     }
-}
-
-#[cfg(test)]
-mod test {
-    #[test]
-    fn test_check_eth_balance() {}
-
-    #[test]
-    fn test_check_erc20_balance() {}
 }

@@ -1,4 +1,3 @@
-use crate::error::MyResult;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
@@ -24,7 +23,7 @@ pub struct EvmConfigs {
     pub interval: i32,
 }
 
-pub fn load_evm_configs() -> MyResult<EvmConfigs> {
+pub fn load_evm_configs() -> anyhow::Result<EvmConfigs> {
     let current_dir = Path::new(file!())
         .parent()
         .expect("Failed to get current directory");

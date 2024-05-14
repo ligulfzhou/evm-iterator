@@ -1,5 +1,4 @@
 use crate::config::config::EvmConfig;
-use crate::error::MyResult;
 use crate::evm::my_wallet::MyWallet;
 
 #[derive(Debug)]
@@ -12,12 +11,18 @@ impl EvmHandler {
         Self { config }
     }
 
-    pub async fn check_balance(&self, account: MyWallet) -> MyResult<()> {
+    pub async fn check_balance(&self, account: MyWallet) -> anyhow::Result<()> {
         // check eth balance
-        account.check_eth_balance(&self.config).await?;
+        let _ = account
+            .check_eth_balance(&self.config)
+            .await
+            .map_err(|_| {});
 
         // check erc20 balance
-        account.check_erc20_balance(&self.config).await?;
+        let _ = account
+            .check_erc20_balance(&self.config)
+            .await
+            .map_err(|_| {});
 
         Ok(())
     }

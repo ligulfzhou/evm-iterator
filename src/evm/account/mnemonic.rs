@@ -1,4 +1,3 @@
-use crate::error::MyResult;
 use crate::evm::account::GenAccount;
 use crate::evm::my_wallet::MyWallet;
 use ethers::core::rand;
@@ -26,7 +25,7 @@ impl MnemonicAccountGenerator {
 }
 
 impl GenAccount for MnemonicAccountGenerator {
-    fn generate_account(&mut self) -> MyResult<MyWallet> {
+    fn generate_account(&mut self) -> anyhow::Result<MyWallet> {
         if self.index > 10 {
             self.reset();
         }
@@ -35,14 +34,7 @@ impl GenAccount for MnemonicAccountGenerator {
             .index(self.index)?
             .build()?;
 
-        println!(
-            "mnemonic: {:}, index: {:}, address: {:}",
-            self.mnemonic,
-            self.index,
-            wallet.address()
-        );
-
-        self.index += 1;
+        self.index.checked_add(1).unwrap();
         Ok(MyWallet(wallet))
     }
 }

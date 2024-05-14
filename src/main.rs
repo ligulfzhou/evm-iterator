@@ -1,4 +1,3 @@
-use crate::error::MyResult;
 use crate::evm::account::keypair::RandomAccountGenerator;
 use crate::evm::account::mnemonic::MnemonicAccountGenerator;
 use crate::iterator::handler::EvmHandler;
@@ -10,7 +9,7 @@ mod evm;
 mod iterator;
 
 #[tokio::main]
-async fn main() -> MyResult<()> {
+async fn main() -> anyhow::Result<()> {
     let evms_config = config::config::load_evm_configs()?;
 
     let handlers = evms_config
@@ -29,7 +28,9 @@ async fn main() -> MyResult<()> {
     account_generator.add_generator(Box::new(random_account_generator));
     account_generator.add_generator(Box::new(mnemonic_account_generator));
 
-    let _ = account_generator.start_generating_accounts(evms_config.interval).await;
+    let _ = account_generator
+        .start_generating_accounts(evms_config.interval)
+        .await;
 
     Ok(())
 }

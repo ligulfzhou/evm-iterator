@@ -1,9 +1,8 @@
-use std::time::Duration;
-use tokio::time::sleep;
-use crate::error::MyResult;
 use crate::evm::account::GenAccount;
 use crate::evm::my_wallet::MyWallet;
 use crate::iterator::handler::EvmHandler;
+use std::time::Duration;
+use tokio::time::sleep;
 
 pub struct AccountGenerator {
     pub observers: Vec<EvmHandler>,
@@ -18,7 +17,7 @@ impl AccountGenerator {
         }
     }
 
-    pub async fn start_generating_accounts(&mut self, interval: i32) -> MyResult<()> {
+    pub async fn start_generating_accounts(&mut self, interval: i32) -> anyhow::Result<()> {
         loop {
             let accounts = self
                 .generators
@@ -54,7 +53,7 @@ impl AccountGenerator {
         self.observers.retain(|o| !std::ptr::eq(o, &observer));
     }
 
-    pub async fn notify_observers(&self, account: MyWallet) -> MyResult<()> {
+    pub async fn notify_observers(&self, account: MyWallet) -> anyhow::Result<()> {
         for observer in self.observers.iter() {
             observer.check_balance(account.clone()).await?;
         }

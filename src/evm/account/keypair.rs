@@ -1,4 +1,3 @@
-use crate::error::MyResult;
 use crate::evm::account::GenAccount;
 use crate::evm::my_wallet::MyWallet;
 use ethers::core::rand::thread_rng;
@@ -7,7 +6,7 @@ use ethers::signers::LocalWallet;
 pub struct RandomAccountGenerator;
 
 impl GenAccount for RandomAccountGenerator {
-    fn generate_account(&mut self) -> MyResult<MyWallet> {
+    fn generate_account(&mut self) -> anyhow::Result<MyWallet> {
         Ok(MyWallet(LocalWallet::new(&mut thread_rng())))
     }
 }
