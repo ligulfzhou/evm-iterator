@@ -2,6 +2,7 @@ use ethers::providers::ProviderError;
 use ethers::signers::WalletError;
 use thiserror::Error;
 
+#[warn(dead_code)]
 pub type MyResult<T> = Result<T, MyError>;
 
 #[derive(Debug, Error)]
