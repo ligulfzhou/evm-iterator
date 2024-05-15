@@ -26,7 +26,7 @@ impl MnemonicAccountGenerator {
 
 impl GenAccount for MnemonicAccountGenerator {
     fn generate_account(&mut self) -> anyhow::Result<MyWallet> {
-        if self.index > 10 {
+        if self.index > 3 {
             self.reset();
         }
         let wallet = MnemonicBuilder::<English>::default()
