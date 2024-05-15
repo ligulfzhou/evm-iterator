@@ -8,7 +8,7 @@ use ethers::{
     types::{Address, TransactionRequest},
 };
 use serde_json::Value;
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 #[derive(Clone)]
 pub struct MyWallet(pub LocalWallet);
@@ -83,7 +83,7 @@ impl MyWallet {
         Ok(())
     }
 
-    pub async fn check_erc20_balance(&self, config: &EvmConfig) -> anyhow::Result<()> {
+    pub async fn check_erc20_balance(&self, config: &EvmConfig, interval: i32) -> anyhow::Result<()> {
         let provider = {
             let rpc = config
                 .rpcs
@@ -97,6 +97,8 @@ impl MyWallet {
         abigen!(Erc20Contract, "./src/assets/erc20.json");
 
         for erc20 in config.erc20s.iter() {
+            tokio::time::sleep(Duration::new(interval as u64, 0)).await;
+
             let contract_address = erc20
                 .contract
                 .clone()

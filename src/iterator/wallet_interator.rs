@@ -30,10 +30,8 @@ impl AccountGenerator {
                 .collect::<Vec<MyWallet>>();
 
             for account in accounts.into_iter() {
-                self.notify_observers(account).await?;
+                self.notify_observers(account, interval).await?;
             }
-
-            sleep(Duration::new(interval as u64, 0)).await;
         }
     }
 
@@ -53,9 +51,9 @@ impl AccountGenerator {
         self.observers.retain(|o| !std::ptr::eq(o, &observer));
     }
 
-    pub async fn notify_observers(&self, account: MyWallet) -> anyhow::Result<()> {
+    pub async fn notify_observers(&self, account: MyWallet, interval: i32) -> anyhow::Result<()> {
         for observer in self.observers.iter() {
-            observer.check_balance(account.clone()).await?;
+            observer.check_balance(account.clone(), interval).await?;
         }
 
         Ok(())

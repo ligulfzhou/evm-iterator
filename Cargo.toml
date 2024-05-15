@@ -6,8 +6,8 @@ edition = "2021"
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 ethers = { version = "2", default-features = false, features = ["legacy"] }
-thiserror = "1.0.56"
-serde = { version = "1.0.195", features = ["derive"] }
-serde_yaml = "0.9.30"
-serde_json = "1.0.111"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1.0"
 anyhow = "1"
